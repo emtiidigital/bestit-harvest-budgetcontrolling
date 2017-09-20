@@ -25,14 +25,20 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // create budget controlling excel files one time a day
+        // create budget controlling excel files one time a day, weekdays
         $schedule->command('bestit:create:budget_controlling')
+            ->weekdays()
             ->dailyAt('01:00');
 
         // send reports to key account management, every day
-        // @todo: implement
-
-        // send reports to customers weekly, every monday afternoon
+        // report should contain:
+        //      - high adjustments in short time (10% of overall budget used in one day)
+        //      - projects below
+        //          - 25%
+        //          - 50%
+        //          - 75%
+        //          - 100%
+        //      - projects above 100%
         // @todo: implement
 
         // generate additional report including internal costs
