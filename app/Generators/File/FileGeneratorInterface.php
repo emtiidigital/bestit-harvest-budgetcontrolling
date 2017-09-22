@@ -4,5 +4,5 @@ namespace App\Generators\File;
 
 interface FileGeneratorInterface
 {
-    public function process(): bool;
+    public function generate(): bool;
 }

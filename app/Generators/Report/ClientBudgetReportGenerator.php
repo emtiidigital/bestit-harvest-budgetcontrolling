@@ -18,9 +18,7 @@ class ClientBudgetReportGenerator implements ReportGeneratorInterface
 {
     /** @var Client $client */
     private $client;
-
     private $projectsRepository;
-    private $excelFileGenerator;
     private $budgetRepository;
 
     /**
@@ -33,7 +31,6 @@ class ClientBudgetReportGenerator implements ReportGeneratorInterface
     ) {
         $this->client = $client;
         $this->projectsRepository = new ProjectsDataRepository();
-        $this->excelFileGenerator = new ExcelFileGenerator();
         $this->budgetRepository = new BudgetDataRepository();
     }
 
@@ -61,9 +58,11 @@ class ClientBudgetReportGenerator implements ReportGeneratorInterface
 
         // create excel file
         if ($client && $data) {
-            $this->excelFileGenerator->setClient($client);
-            $this->excelFileGenerator->setData($data);
-            $this->excelFileGenerator->process();
+            $generator = new ExcelFileGenerator();
+            $generator->setFileNamePrefix($client->id);
+            $generator->setFileName($client->name);
+            $generator->setFileData($data);
+            $generator->generate();
 
             return true;
         }

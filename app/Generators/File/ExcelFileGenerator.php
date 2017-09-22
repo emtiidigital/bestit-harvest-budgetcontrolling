@@ -3,7 +3,6 @@
 namespace App\Generators\File;
 
 use App\Events\Generators\File\ExcelFileCreatedEvent;
-use BestIt\Harvest\Models\Clients\Client;
 use Excel;
 
 /**
@@ -12,65 +11,71 @@ use Excel;
  */
 class ExcelFileGenerator implements FileGeneratorInterface
 {
-    /** @var $client */
-    private $client;
-    /** @var $data */
-    private $data;
+    private $fileNamePrefix;
+    private $fileNameSuffix;
+    private $fileName;
+    private $fileData;
 
-    /**
-     * Create excel file for every customer with prepared data from harvest api.
-     *
-     * @return bool
-     */
-    public function process(): bool
+    public function generate(): bool
     {
-        $c = $this->getClient();
-        $d = $this->getData();
+        $data = $this->getFileData();
+        $name = sprintf(
+            '%s - %s - %s',
+            $this->getFileNamePrefix() ?? 'Report for',
+            $this->getFileName(),
+            $this->getFileNameSuffix() ?? 'generated'
+        );
 
-        info('Create Excel file for customer: ' . $c->name);
+        info('Create Excel File: ' . $name);
 
-        $filename = $c->id . ' - ' . $c->name;
-
-        Excel::create($filename, function ($excel) use ($d) {
-            $excel->sheet('Controlling', function ($sheet) use ($d) {
-                $sheet->fromArray($d, null, 'A1', true);
+        Excel::create($name, function ($excel) use ($data) {
+            $excel->sheet('Controlling', function ($sheet) use ($data) {
+                $sheet->fromArray($data, null, 'A1', true);
             });
         })->store('xls');
 
-        event(new ExcelFileCreatedEvent($c, $d));
+        event(new ExcelFileCreatedEvent());
 
         return true;
     }
 
-    /**
-     * @return Client
-     */
-    private function getClient(): Client
+    public function setFileNamePrefix($fileNamePrefix)
     {
-        return $this->client;
+        $this->fileNamePrefix = $fileNamePrefix;
     }
 
-    /**
-     * @param Client $client
-     */
-    public function setClient($client)
+    public function setFileName($fileName)
     {
-        $this->client = $client;
+        $this->fileName = $fileName;
     }
 
-    /**
-     * @return array
-     */
-    public function getData(): array
+    public function setFileData($fileData)
     {
-        return $this->data;
+        $this->fileData = $fileData;
     }
 
-    /**
-     * @param array $data
-     */
-    public function setData(array $data)
+    private function getFileName()
     {
-        $this->data = $data;
+        return $this->fileName;
+    }
+
+    public function getFileData()
+    {
+        return $this->fileData;
+    }
+
+    public function getFileNamePrefix()
+    {
+        return $this->fileNamePrefix;
+    }
+
+    public function getFileNameSuffix()
+    {
+        return $this->fileNameSuffix;
+    }
+
+    public function setFileNameSuffix($fileNameSuffix)
+    {
+        $this->fileNameSuffix = $fileNameSuffix;
     }
 }
