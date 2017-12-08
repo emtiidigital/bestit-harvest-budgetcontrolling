@@ -8,6 +8,7 @@ use App\Repository\Projects\ProjectsDataRepository;
 use BestIt\Harvest\Models\Clients\Client;
 use BestIt\Harvest\Models\Projects\Project;
 use BestIt\Harvest\Models\Projects\Projects;
+use Carbon\Carbon;
 
 /**
  * Class ClientBudgetReportGenerator
@@ -99,14 +100,14 @@ class ClientBudgetReportGenerator implements ReportGeneratorInterface
      */
     private function getMainProjectData(Project $project): array
     {
+        setlocale(LC_MONETARY, 'de_DE');
+
         return [
-            'code' => $project->code,
-            'name' => $project->name,
-            'createdAt' => $project->createdAt,
-            'active' => $project->active,
-            'status' => $project->notes,
-            'projectEstimate' => $project->estimate,
-            'projectBudget' =>  $project->budget,
+            'Leistungsschein Nummer' => $project->code,
+            'Leistungsschein Bezeichnung' => $project->name,
+            'LS beauftragt' => Carbon::parse($project->createdAt)->format('d/m/Y'),
+            'Kostenindikation' => money_format('%!n €', $project->budget),
+            'Status' => $project->notes .'%',
         ];
     }
 
@@ -122,10 +123,16 @@ class ClientBudgetReportGenerator implements ReportGeneratorInterface
      */
     private function getCalculatedProjectBudgetData(Project $project): array
     {
+        if ((int)$project->notes !== 0 && $project->notes !== null ) {
+            $hochrechnung = ((int)$this->budgetRepository->getUsedBudget($project->id) * 100) / (int)$project->notes;
+        } else {
+            $hochrechnung = 0;
+        }
+
         return [
-            'usedBudget' => $this->budgetRepository->getUsedBudget($project->id),
-            //'calcNeededBudget' =>,
-            //'diffBudget' =>
+            'gebucht' => money_format('%!n', $this->budgetRepository->getUsedBudget($project->id)),
+            'Hochrechnung' => money_format('%!n', $hochrechnung),
+            'Deckung' => money_format('%!n', $project->budget - $hochrechnung),
         ];
     }
 }

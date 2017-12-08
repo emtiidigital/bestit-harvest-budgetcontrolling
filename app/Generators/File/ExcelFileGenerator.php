@@ -27,10 +27,21 @@ class ExcelFileGenerator implements FileGeneratorInterface
         );
 
         info('Create Excel File: ' . $name);
-
         Excel::create($name, function ($excel) use ($data) {
+
             $excel->sheet('Controlling', function ($sheet) use ($data) {
                 $sheet->fromArray($data, null, 'A1', true);
+
+                $sheet->row(1, function ($row) {
+                    $row->setBackground('#000000');
+                });
+
+                $sheet->cells('A1:H1', function ($cells) {
+
+                    $cells->setFontColor('#ffffff');
+
+                });
+
             });
         })->store('xls');
 
