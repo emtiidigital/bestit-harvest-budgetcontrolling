@@ -22,7 +22,7 @@ class SendEmailToBestItAccountsExchangeGroup
      */
     public function handle(ExcelFileCreatedEvent $event)
     {
-        // get harvest clients from event
+        // get filename of excel file
         $fileName = $event->getFileName();
 
         // purpose of listener

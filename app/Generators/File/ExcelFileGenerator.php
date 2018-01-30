@@ -44,7 +44,7 @@ class ExcelFileGenerator implements FileGeneratorInterface
             });
         })->store(self::EXCEL_FILE_TYPE);
 
-        $fqfn = $name . '.' .self::EXCEL_FILE_TYPE;
+        $fqfn = $name . '.' . self::EXCEL_FILE_TYPE;
         event(new ExcelFileCreatedEvent($fqfn));
 
         return true;
