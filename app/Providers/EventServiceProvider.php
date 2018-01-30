@@ -7,6 +7,7 @@ use App\Events\Clients\CreateBudgetControllingFilesEvent;
 use App\Events\Generators\File\ExcelFileCreatedEvent;
 use App\Listeners\CreateBudgetControllingFileListener;
 use App\Listeners\CreateRessourceForecastByEmployeesListener;
+use App\Listeners\SendEmailToBestItAccountsExchangeGroup;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -21,7 +22,7 @@ class EventServiceProvider extends ServiceProvider
             CreateBudgetControllingFileListener::class
         ],
         ExcelFileCreatedEvent::class => [
-            // todo: implement listeners, if needed
+            SendEmailToBestItAccountsExchangeGroup::class
         ],
         CreateRessourcesForecastEvent::class => [
             CreateRessourceForecastByEmployeesListener::class

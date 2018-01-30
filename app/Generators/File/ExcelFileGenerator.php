@@ -11,6 +11,8 @@ use Excel;
  */
 class ExcelFileGenerator implements FileGeneratorInterface
 {
+    const EXCEL_FILE_TYPE = 'xls';
+
     private $fileNamePrefix;
     private $fileNameSuffix;
     private $fileName;
@@ -37,15 +39,13 @@ class ExcelFileGenerator implements FileGeneratorInterface
                 });
 
                 $sheet->cells('A1:H1', function ($cells) {
-
                     $cells->setFontColor('#ffffff');
-
                 });
-
             });
-        })->store('xls');
+        })->store(self::EXCEL_FILE_TYPE);
 
-        event(new ExcelFileCreatedEvent());
+        $fqfn = $name . '.' .self::EXCEL_FILE_TYPE;
+        event(new ExcelFileCreatedEvent($fqfn));
 
         return true;
     }
