@@ -102,11 +102,19 @@ class ClientBudgetReportGenerator implements ReportGeneratorInterface
     {
         setlocale(LC_MONETARY, 'de_DE');
 
+        $projectBudget = $project->budget;
+
+        // if project->budget is less than 1000, we assume budget is in hours,
+        // so need to multiply by hourly rate for overall budget in euros
+        if ($projectBudget < 1000) {
+            $projectBudget *= $project->hourlyRate;
+        }
+
         return [
             'Leistungsschein Nummer' => $project->code,
             'Leistungsschein Bezeichnung' => $project->name,
             'LS beauftragt' => Carbon::parse($project->createdAt)->format('d/m/Y'),
-            'Kostenindikation' => money_format('%!n €', $project->budget),
+            'Kostenindikation' => money_format('%!n €', $projectBudget),
             'Status' => $project->notes .'%',
         ];
     }
@@ -123,10 +131,10 @@ class ClientBudgetReportGenerator implements ReportGeneratorInterface
      */
     private function getCalculatedProjectBudgetData(Project $project): array
     {
-        if ((int)$project->notes !== 0 && $project->notes !== null ) {
+        $hochrechnung = 0;
+
+        if ((int)$project->notes !== 0 && $project->notes !== null) {
             $hochrechnung = ((int)$this->budgetRepository->getUsedBudget($project->id) * 100) / (int)$project->notes;
-        } else {
-            $hochrechnung = 0;
         }
 
         return [
